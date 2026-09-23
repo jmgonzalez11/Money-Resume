@@ -9,6 +9,60 @@ Tiempo estimado: unos 30 minutos la primera vez.
 
 ---
 
+## Cómo aplicar una actualización (2 minutos)
+
+Cuando te entregue una versión nueva, normalmente solo cambian `index.html` y `sw.js`.
+
+1. En el Mac, entra a tu repositorio en github.com.
+2. **Add file → Upload files**, arrastra `index.html` y `sw.js` (y cualquier otro archivo que te indique) y presiona **Commit changes**. GitHub reemplaza los archivos anteriores.
+3. Espera 1 o 2 minutos a que GitHub Pages publique.
+4. Abre la app en el iPhone o el Mac. Aparecerá el aviso **«Hay una versión nueva. Toca para actualizar»**. Si no aparece, cierra la app por completo y vuelve a abrirla.
+
+Para confirmar que tienes la última versión, revisa el número al final de **Ajustes**.
+
+Tus datos no se pierden al actualizar: quedan en cada dispositivo y en tu hoja de Google.
+
+Si una versión trae cambios en `Code.gs`, te lo diré. En ese caso, además, pega el código nuevo en Apps Script y ve a **Implementar → Gestionar implementaciones → Editar → Versión: nueva**.
+
+---
+
+## Novedades de la versión 5 (requiere actualizar también Code.gs)
+
+**Cómo actualizar:**
+1. Sube `index.html` y `sw.js` a GitHub, como siempre.
+2. En Apps Script, reemplaza el contenido de `Code.gs` por el nuevo.
+3. Ejecuta una vez `configurar`. Google pedirá permiso para **Calendar**, que usan los avisos de vencimientos.
+4. Ve a **Implementar → Gestionar implementaciones → Editar → Versión: nueva**. La dirección `/exec` no cambia.
+
+**Qué hay de nuevo:**
+
+- **Movimientos no facturados.** Sube el PDF «Saldo y movimientos no facturados» (nacional o internacional) desde Movimientos o Deudas.
+  - Cada movimiento se cruza con lo ya registrado: mismo monto, ±3 días.
+  - Lo que ya estaba no se duplica; lo que falta se agrega.
+  - Los pagos a la tarjeta se ignoran, y las anulaciones o reversas se compensan con su cargo.
+  - Si vuelves a subir el mismo PDF (o uno más nuevo), solo se agrega lo nuevo.
+  - Las compras del período también alimentan Deudas para estimar el próximo pago, hasta que subas el estado de cuenta facturado.
+- **Egresos nacionales e internacionales**, separados en Movimientos y en el Resumen.
+- **Movimientos fijos mensuales** (Movimientos → «Movimientos fijos»). Sirven para transferencias a tu familia, la cuota de un crédito o un sueldo fijo.
+  - Indicas la fecha del primer pago y, si termina, la del último.
+  - Cada mes se registra solo en su fecha. Si después llega el correo o la cartola del mismo pago, no se duplica.
+  - Si marcas «Es el pago de una deuda», aparece en Deudas con las cuotas pagadas.
+- **Proyección de fin de mes** en el Resumen. Suma lo que falta del mes: ingresos y pagos fijos, suscripciones por renovarse, cuotas de créditos y el gasto variable estimado.
+- **Presupuesto por categoría** en el Resumen, con avisos al 80% y al 100%.
+- **Costo de la tarjeta** en Deudas:
+  - intereses de las compras en cuotas,
+  - comisiones, seguros e impuestos,
+  - estimado anual,
+  - qué compras conviene prepagar primero (las de mayor tasa).
+  - Para ver intereses y tasas, vuelve a subir el estado de cuenta.
+- **Honorarios y Operación Renta** en Análisis: total bruto, retenciones y detalle por pagador, con descarga en CSV. Al registrar una boleta ahora puedes indicar el pagador.
+- **Avisos en Google Calendar** (Ajustes). Crea un calendario «Finanzas» con los pagos de los próximos 60 días (tarjetas, cuotas, suscripciones y movimientos fijos). Cada evento avisa 3 días y 1 día antes, y se actualiza al sincronizar.
+- **Muestras para ajustar el lector de correos.** En Apps Script, ejecuta `exportarMuestras`. Crea la hoja «muestras» con hasta 6 correos recientes por banco, con nombres, correos, RUT y números de cuenta o tarjeta tapados, junto con lo que entendió el lector.
+  - Revisa la hoja antes de compartirla y borra cualquier dato personal que haya quedado.
+  - Compárteme esa hoja para ajustar el lector a tus bancos.
+
+---
+
 ## 1. Backend en Apps Script
 
 1. Entra a [script.google.com](https://script.google.com) con la cuenta de Gmail donde llegan los vouchers y crea un **Proyecto nuevo**. Ponle de nombre «Finanzas».
@@ -118,6 +172,23 @@ Arriba verás la **deuda total**, el **próximo pago** y los **pagos de los pró
 - Las compras «00/03» (primera cuota el mes siguiente) parten un mes después.
 
 **Créditos ingresados a mano:** indicas el total de cuotas, las ya pagadas y el día de pago. La app suma una cuota pagada cada vez que pasa ese día.
+- Si ingresas el **monto total**, el valor de la cuota se calcula solo (monto dividido por cuotas, sin intereses). Puedes cambiarlo.
+- Un solo pago se registra como 1 cuota.
+
+**Corregir una deuda:** toca cualquier compra en la lista de deudas. Puedes cambiar:
+- el nombre,
+- el monto,
+- si tiene cuotas o no,
+- cuántas cuotas tiene y cuántas llevas pagadas,
+- el valor de la cuota.
+
+Si no escribes el valor de la cuota, se calcula como el monto dividido por las cuotas, sin intereses. Mientras editas, un resumen muestra cuántas cuotas quedan, cuánto falta y cuándo terminas.
+
+Las compras que el banco cobró sin cuotas aparecen en **«Compras sin cuotas del último estado de cuenta»**. Tócalas para pasarlas a cuotas.
+
+**Quitar de deudas** saca un cargo de la lista. Se puede volver a marcar en **Revisar cargos**.
+
+**Cerrar sin guardar:** todas las ventanas tienen una **×** arriba y un botón **Cancelar**. También se cierran tocando fuera de ellas o, en el Mac, con la tecla Esc.
 
 La estimación supone que pagas cada estado de cuenta a tiempo. Sube el estado de cuenta nuevo cada mes: se usa el más reciente de cada tarjeta y corrige cualquier diferencia.
 
@@ -170,4 +241,3 @@ En Apps Script, la función `probarLector` muestra en el registro qué entiende 
 |---|---|
 | `Code.gs`, `appsscript.json` | Proyecto de Apps Script |
 | `index.html`, `sw.js`, `manifest.json`, `icon-192.png`, `icon-512.png` | GitHub Pages u otro hosting `https` |
-
